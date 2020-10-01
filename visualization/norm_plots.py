@@ -13,36 +13,55 @@ Created on Mon Jan 09 20:46:52 2017
 """
 import scipy.io as sio
 import numpy as np
+import pandas as pd
 import json
+import glob
+import os
 from pprint import pprint
+import re
+
+from scipy.sparse.extract import find
 
 #%%
+wordId_df = pd.read_csv('data/wordIDHash.csv', header=0, names=['id', 'word', 'unknown'])
+word2Id = pd.Series(wordId_df.id.values,index=wordId_df.word).to_dict()
 
-wordlist = []
-fid = open('data/wordlist.txt','r')
-for line in fid:
-    wordlist.append(line.strip())
-fid.close()
-nw = len(wordlist)
-    
-word2Id = {}
-for k in xrange(len(wordlist)):
-    word2Id[wordlist[k]] = k
-times = range(180,200) # total number of time points (20/range(27) for ngram/nyt)
-emb_all = sio.loadmat('results/emb_frobreg10_diffreg50_symmreg10_iter10.mat')
+times = range(0,26) # total number of time points (20/range(27) for ngram/nyt)
+# emb_all = sio.loadmat('results/emb_frobreg10_diffreg50_symmreg10_iter10.mat')
+# emb_all = sio.loadmat('embeddings/embeddings_0.mat')
 
+def load_embeddings_map(embeddings_dir):
+    to_load = glob.glob(os.path.join(embeddings_dir, "*"))
+    mat_objects = [ sio.loadmat(p)['U'] for p in to_load]
+    embeddings_year = [ int(re.findall(r'\d+', os.path.basename(p))[0]) for p in to_load]
+    return { k:m for k,m in  zip(embeddings_year, mat_objects)}
+
+emb = sio.loadmat('embeddings/embeddings_10.mat')
+
+print emb['U'].shape
+
+emb_all = load_embeddings_map('embeddings')
 #%%
-words = ['thou','chaise','darwin','telephone']
+
+# print emb_all
+
+words = ['cell','telephone', 'apple', 'banana']
+# words = ['thou','chaise','darwin','telephone']
 allnorms = []
 for w in words:
     norms = []
     for year in times:
-        emb = emb_all['U_%d' % times.index(year)][word2Id[w],:]
+        # emb = emb_all['U_%d' % times.index(year)][word2Id[w],:]
+        emb = emb_all[year][word2Id[w]]
         norms.append(np.linalg.norm(emb))
     
     norms = np.array(norms)
     norms = norms / sum(norms)
     allnorms.append(norms)
+
+#%%
+corr = np.corrcoef(allnorms, rowvar=True)
+print corr
 #%%
 import matplotlib.pyplot as plt
 import pickle
