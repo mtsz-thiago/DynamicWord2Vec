@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "BIMT:visualization.tsne2.read_words_reverse_index (python3.7)",
+            "invokeTarget": {
+                "target": "code",
+                "projectRoot": "",
+                "lambdaHandler": "visualization.tsne2.read_words_reverse_index"
+            },
+            "lambda": {
+                "runtime": "python3.7",
+                "payload": {},
+                "environmentVariables": {}
+            }
+        }
+    ]
+}
