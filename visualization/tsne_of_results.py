@@ -9,34 +9,41 @@ import numpy as np
 import json
 from pprint import pprint
 from scipy.spatial.distance import pdist
+import pickle
+import pandas as pd
 #%%
 
 
-word = 'communist'
+# word = 'communist'
+# word = 'politics'
+# word = "apple"
+word = "obama"
 
+# wordlist = []
+# with open('data/wordlist.txt','r') as fi:
+#     wordlist = fi.readlines() 
 
-wordlist = []
-fid = open('data/wordlist.txt','r')
-for line in fid:
-    wordlist.append(line.strip())
-fid.close()
-nw = len(wordlist)
-    
-word2Id = {}
-for k in xrange(len(wordlist)):
-    word2Id[wordlist[k]] = k
+# wordlist = [s.strip() for s in wordlist]
 
+wordId_df = pd.read_csv('data/wordIDHash.csv', header=0, names=['id', 'word', 'unknown'])
+wordlist = wordId_df.word.values
+word2Id_all = pd.Series(wordId_df.id.values,index=wordId_df.word).to_dict()
+word2Id = word2Id_all
 
 times = range(180,200) # total number of time points (20/range(27) for ngram/nyt)
 
-emb_all = sio.loadmat('results/embeddings.mat')
+# loading prepared_embeddings object
+with open('results/prepared_embeddings.pkl', 'r') as f:
+    emb_all = pickle.load(f)
 
 #%%
 
-nn = 50
+nn = 5 # top related words per year list length
 nc = 5
 emb = emb_all['U_%d' % times.index(199)]
-             
+
+# emb = emb[global_ids, :]
+
 X = []
 list_of_words = []
 isword = []
@@ -54,7 +61,6 @@ for year in times:
 
 
     d =np.dot(emb_normalized,v)
-    
     idx = np.argsort(d)[::-1]
     newwords = [(wordlist[k], year) for k in list(idx[:nn])]
     print newwords
@@ -99,6 +105,9 @@ for k in xrange(len(list_of_words)):
 
 traj = np.vstack(traj)
 plt.plot(traj[:,0],traj[:,1])
+plt.title("top %d related words trajectories" % nn)
+plt.xlabel("TSN! dim 0")
+plt.ylabel("TSN! dim 1")
 plt.show()
 
 sio.savemat('tsne_output/%s_tsne.mat'%word,{'emb':Z})

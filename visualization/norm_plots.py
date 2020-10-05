@@ -38,7 +38,7 @@ def load_embeddings_map(embeddings_dir):
 
 emb = sio.loadmat('embeddings/embeddings_10.mat')
 
-print emb['U'].shape
+print emb
 
 emb_all = load_embeddings_map('embeddings')
 #%%
