@@ -1,0 +1,4 @@
+data/
+results/*
+tsne_output/*
+**.pyc
