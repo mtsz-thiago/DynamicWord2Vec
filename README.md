@@ -67,3 +67,11 @@ A rotina de visualização cria gárficos das trajetórias dos embeddings mapead
 ```shell
 python visualization/trajectories.py --target-word amazon
 ```
+
+Gera seguinte saída na pasta result:
+
+<p align="center">
+  <img src="./figs/amazon_trajectory_ns4.png"
+     alt="Markdown Monster icon"
+     style="float: center; margin-right: 10px;" />  
+</p>

@@ -63,20 +63,22 @@ def get_words_labels(words):
 
 def print_trjectories(tsne_projections, words, target_word):
 
+    neighborhood_size = words.shape[1] - 1
+
     flattened_projections = tsne_projections.reshape(-1,PROJECTION_DIMS)
     flattened_words = words.reshape(-1)
     words_labels = get_words_labels(words)
 
     target_word_idx = np.argwhere(flattened_words == target_word)
     target_word_projections = flattened_projections[target_word_idx].reshape(-1,PROJECTION_DIMS)
-    print(target_word_projections.shape)
 
-    plt.figure()
+    fig = plt.figure()
     plt.plot(flattened_projections[:,0], flattened_projections[:,1], 'b.')
     for x,y, label in zip(flattened_projections[:,0], flattened_projections[:,1], words_labels):
         plt.text(x, y, label)
     plt.plot(target_word_projections[:,0], target_word_projections[:,1], 'r-')
     plt.title("Trajetoria e vizinhanca da palavra '%s' no corpus" % target_word)    
+    fig.savefig('results/%s_trajectory_ns%d.png' % (target_word, neighborhood_size))
     plt.show()
 
 def get_target_word_closest_neighborhood_for_each_time_slice(target_word, times, embeddings, word_idx, list_len):
